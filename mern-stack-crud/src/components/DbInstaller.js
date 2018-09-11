@@ -9,38 +9,6 @@ class DbInstaller extends React.Component {
         list:'',
         fName:''
     }
-    componentWillMount(){
-        // axios.get('/api/reskill/getSkillgroups').then(response =>{
-        //     this.setState({
-        //         list: response.data
-        //     });
-        // }).catch(error => {
-        //     //console.log(error.response.data.error)
-        // });
-        axios.get('/api/reskill/getOneSkillGroup',{
-            params:{
-                name:'Digital'
-            }
-        }).then(response =>{
-            this.setState({
-                fName: response.data.name
-            });
-        }).catch(error => {
-            //console.log(error.response.data.error)
-        });
-        axios.get('/api/reskill/getOneComponentSkill',{
-            params:{
-                cName:'DevOps',
-                grpName:"Digital"
-            }
-        }).then(response =>{
-            this.setState({
-                fName: response.data.name
-            });
-        }).catch(error => {
-            //console.log(error.response.data.error)
-        });
-    }
 
     addSkillSet1(e){
         e.preventDefault();
