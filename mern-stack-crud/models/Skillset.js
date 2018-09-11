@@ -1,18 +1,28 @@
 const mongoose=require('mongoose');
 const Schema=mongoose.Schema;
 
-//Create Schema
+const ComponentGrpSkills=new Schema({
+        name:{
+            type:String,
+            required:true
+        },
+        grpName:{
+            type:String,
+            required:true
+        },
+        skillset:{
+            type:[String],
+            required:true
+        }
+});
+    //Create Schema
 const SkillSetSchema=new Schema({
     name:{
         type:String,
         required:true
     },
-    DM: {
-        type: [String],
-        required:true
-    },
-    LOB: {
-        type: [String],
+    Components:{
+        type:[ComponentGrpSkills],
         required:true
     }
 });
