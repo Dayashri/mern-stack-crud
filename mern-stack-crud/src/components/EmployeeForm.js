@@ -6,9 +6,13 @@ import '../App.css';
 
 class EmployeeForm extends React.Component {
     state = {
+        selectedOptionp:'',
         selectedOption1: '',
         selectedOption2: '',
         messageFromServer:'',
+        portifolioOptions:[],
+        DMOptions:[],
+        LObLeadOptions:[],
         fName:'',
         fNameErr:'',
         lName:'',
@@ -29,7 +33,33 @@ class EmployeeForm extends React.Component {
         }
         this.setState({ selectedOption1:selectedOption,skill1Err:skill1Err });
     }
-    
+    handlePortiFolioChange=(selectedOption)=>{
+        if(!selectedOption.value==""){
+            axios.get('/api/reskill/getOnlyPortifolio',{
+                params:{
+                    name:selectedOption.value
+                }
+            }).then(response =>{
+                var DMOptions=[];
+                var dmOptions=[];
+                var lobOptions=[];
+                var rep=response.data;debugger
+                rep.forEach(function(data){
+                    dmOptions=data.DM;
+                    lobOptions=data.LOB;
+                });
+                dmOptions.forEach(function(data){
+                    DMOptions:[{label:data,value:data}]
+                })
+                    this.setState({
+                        DMOptions:DMOptions,selectedOptionp:selectedOption,
+                        LObLeadOptions:[{label:"Please select Your DM",value:""}]
+                    });
+                }).catch(error => {
+                    //console.log(error.response.data.error)
+                });
+        }
+    }
     handleChange2 = (selectedOption) => {
         var skill2Err="";
         if(selectedOption.length===0){
@@ -133,87 +163,32 @@ class EmployeeForm extends React.Component {
             subMandatoryErr:subMandatoryErr
         });
     }
-
-    addPortifolio1(e){
-        e.preventDefault();
-        var protifolioStrings=[{
-            "name":"People Solutions",
-            "DM":["Sudip Ghose"],
-            "LOB":["Hari","Balaji G"]
-            },
-{
-            "name":"People Modernization",
-            "DM":["Sudip Ghose"],
-            "LOB":["Balaji R","Arun"]
-            },
-{
-            "name":"GBS",
-            "DM":["Sudip Ghose"],
-            "LOB":["Balaji R","Arun"]
-            },
-{
-            "name":"LATAM",
-            "DM":["Sudip Ghose"],
-            "LOB":["Ramu","Alejandra"]
-            },
-{
-            "name":"Support",
-            "DM":["Swarup Dutta"],
-            "LOB":["Vamsi","Murali"]
-            },
-{
-            "name":"Stores",
-            "DM":["Swarup Dutta"],
-            "LOB":["Kiran","Surya"]
-            },
-{
-            "name":"Tech Mod",
-            "DM":["Swarup Dutta"],
-            "LOB":["Ravi P","Saravanand"]
-            },
-{
-            "name":"GDAP",
-            "DM":["Swarup Dutta"],
-            "LOB":["Venu","Saravanand"]
-            },
-{
-            "name":"Infra",
-            "DM":["Swarup Dutta"],
-            "LOB":["Chris","Sharmila"]
-            },
-{
-            "name":"Merc",
-            "DM":["Santhosh Gopal"],
-            "LOB":["Ramesh","Deepti"]
-            },
-{
-            "name":"RM",
-            "DM":["Santhosh Gopal"],
-            "LOB":["Manoj"]
-            },
-{
-            "name":"IPS",
-            "DM":["Sudip Ghose"],
-            "LOB":["Saroja"]
-            }];
-            protifolioStrings.forEach(function(querystring){
-                axios.post('/api/reskill/addPortifolio',querystring).then(response =>{
-                    this.setState({
-                        messageFromServer: response.data
-                    });
-                }).catch(error => {
-                    //console.log(error.response.data.error)
-                });
+    
+    componentWillMount(){debugger
+        axios.get('/api/reskill/getAllPortifolio').then(response =>{
+            var portifolioOptions=[];
+            var rep=response.data;
+            rep.forEach(function(data){
+                portifolioOptions.push({label:data.name,value:data.name});
             });
-        
-
+                this.setState({
+                    portifolioOptions: portifolioOptions,
+                    
+                    DMOptions:[{label:"Please select Your Portifolio",value:""}],
+                    LObLeadOptions:[{label:"Please select Your Portifolio",value:""}]
+                });
+            }).catch(error => {
+                //console.log(error.response.data.error)
+            });
     }
 
     render() {
+        const selectedOptionp  = this.state.selectedOptionp;
         const selectedOption1  = this.state.selectedOption1;
         const selectedOption2  = this.state.selectedOption2;
         const value1 = selectedOption1 && selectedOption1.value;
         const value2 = selectedOption2 && selectedOption2.value;
+        const valuep = selectedOptionp && selectedOptionp.value;
         const options1 = [
             {
                 label: 'UI', options: [
@@ -243,26 +218,30 @@ class EmployeeForm extends React.Component {
         <Container>
             <Form onSubmit={this.handleSubmit.bind(this)}>
                 <FormGroup>
-                    <Label for="fName">First Name</Label>
-                    <Input type="text" name="fName" id="fName" ref="fName" onChange={this.onChangeFname.bind(this)}/>
+                    <Label for="empId">Emp ID </Label>
+                    <Input type="text" name="empId" id="empId" ref="empId" onChange={this.onChangeEmpId.bind(this)}/>
                     <span className="errCls">{this.state.fNameErr}</span>
                 </FormGroup>
                 <FormGroup>
-                    <Label for="lName">Last Name</Label>
-                    <Input type="text" name="lName" id="lName" ref="lName" onChange={this.onChangeLname.bind(this)}/>
+                    <Label for="empEml">Email ID</Label>
+                    <Input type="text" name="empEml" id="empEml" ref="empEml" onChange={this.onChangeEmpId.bind(this)}/>
                     <span className="errCls">{this.state.lNameErr}</span>
                 </FormGroup>
                 <FormGroup>
-                    <Label for="employeeId">Employee Id</Label>
-                    <Input type="text" name="employeeId" id="employeeId" ref="employeeId" onChange={this.onChangeEmpId.bind(this)}/>
-                    <span className="errCls">{this.state.empErr}</span>
+                    <Label for="portifolio">Portifolio</Label>
+                    <Select ref="portifolio"
+                        value={value1}
+                        options={this.state.portifolioOptions}
+                        hideSelectedOptions={false}
+                        isSearchable={false}
+                        onChange={this.handlePortiFolioChange}
+                    />
                 </FormGroup>
                 <FormGroup>
-                    <Label for="exampleSelectMulti">Skill Set 1</Label>
-                    <Select ref="skill1"
-                        isMulti
+                    <Label for="dm">DM</Label>
+                    <Select ref="dm"
                         value={value1}
-                        options={options1}
+                        options={this.state.DMOptions}
                         hideSelectedOptions={false}
                         isSearchable={false}
                         onChange={this.handleChange1}
@@ -270,14 +249,13 @@ class EmployeeForm extends React.Component {
                     <span className="errCls">{this.state.skill1Err}</span>
                 </FormGroup>
                 <FormGroup>
-                    <Label for="exampleSelectMulti">Skill Set 2</Label>
-                    <Select ref="skill2"
-                        isMulti
+                    <Label for="lob">LOB</Label>
+                    <Select ref="lob"
                         value={value2}
                         hideSelectedOptions={false}
                         isSearchable={false}
                         onChange={this.handleChange2}
-                        options={options2}
+                        options={this.state.LObLeadOptions}
                     />
                     <span className="errCls">{this.state.skill2Err}</span>
                 </FormGroup>
@@ -285,7 +263,6 @@ class EmployeeForm extends React.Component {
                 <h5 className="errCls">{this.state.subMandatoryErr}</h5>
                 <Button color="success">Submit</Button>
             </Form>
-            <Button color="success" onClick={this.addPortifolio1.bind(this)}>Add portifolio</Button>
         </Container>
         );
     }
