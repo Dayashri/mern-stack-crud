@@ -136,18 +136,76 @@ class EmployeeForm extends React.Component {
 
     addPortifolio1(e){
         e.preventDefault();
-        var querystring={
+        var protifolioStrings=[{
             "name":"People Solutions",
             "DM":["Sudip Ghose"],
             "LOB":["Hari","Balaji G"]
-            };
-        axios.post('/api/reskill/addPortifolio',querystring).then(response =>{
-            this.setState({
-                messageFromServer: response.data
+            },
+{
+            "name":"People Modernization",
+            "DM":["Sudip Ghose"],
+            "LOB":["Balaji R","Arun"]
+            },
+{
+            "name":"GBS",
+            "DM":["Sudip Ghose"],
+            "LOB":["Balaji R","Arun"]
+            },
+{
+            "name":"LATAM",
+            "DM":["Sudip Ghose"],
+            "LOB":["Ramu","Alejandra"]
+            },
+{
+            "name":"Support",
+            "DM":["Swarup Dutta"],
+            "LOB":["Vamsi","Murali"]
+            },
+{
+            "name":"Stores",
+            "DM":["Swarup Dutta"],
+            "LOB":["Kiran","Surya"]
+            },
+{
+            "name":"Tech Mod",
+            "DM":["Swarup Dutta"],
+            "LOB":["Ravi P","Saravanand"]
+            },
+{
+            "name":"GDAP",
+            "DM":["Swarup Dutta"],
+            "LOB":["Venu","Saravanand"]
+            },
+{
+            "name":"Infra",
+            "DM":["Swarup Dutta"],
+            "LOB":["Chris","Sharmila"]
+            },
+{
+            "name":"Merc",
+            "DM":["Santhosh Gopal"],
+            "LOB":["Ramesh","Deepti"]
+            },
+{
+            "name":"RM",
+            "DM":["Santhosh Gopal"],
+            "LOB":["Manoj"]
+            },
+{
+            "name":"IPS",
+            "DM":["Sudip Ghose"],
+            "LOB":["Saroja"]
+            }];
+            protifolioStrings.forEach(function(querystring){
+                axios.post('/api/reskill/addPortifolio',querystring).then(response =>{
+                    this.setState({
+                        messageFromServer: response.data
+                    });
+                }).catch(error => {
+                    //console.log(error.response.data.error)
+                });
             });
-        }).catch(error => {
-            //console.log(error.response.data.error)
-        });
+        
 
     }
 
