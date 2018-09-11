@@ -1,0 +1,13 @@
+.errCls{
+  color:red;
+  font-weight:600;
+}
+
+.succCls{
+  color:green;
+  font-weight:600;
+}
+
+.expCls{
+  align-content: center;
+}
