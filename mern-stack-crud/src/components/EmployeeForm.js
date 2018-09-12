@@ -1,5 +1,8 @@
 import React from 'react';
 import { Container,Button, Form, FormGroup, Label, Input } from 'reactstrap';
+import {RadioGroup, Radio} from 'react-radio-group';
+import {Checkbox, CheckboxGroup} from 'react-checkbox-group';
+import 'rc-checkbox/assets/index.css';
 import Select from 'react-select';
 import axios from 'axios';
 import '../App.css';
@@ -19,6 +22,8 @@ class EmployeeForm extends React.Component {
         grpOptions:[],
         compGrpOptions:[],
         skillGrpOptions:[],
+        certifiedFlag:'',
+        certificationType:[],
         fName:'',
         fNameErr:'',
         lName:'',
@@ -29,6 +34,16 @@ class EmployeeForm extends React.Component {
         skill2Err:'',
         subMandatoryErr:''
     }
+
+    handleCertifiedChg(value) {
+        this.setState({certifiedFlag: value});
+    }
+
+    handleCertTypeChg = (certificationType) => {
+        this.setState({
+            certificationType: certificationType
+        });
+      }
 
     handlePortiFolioChange=(selectedOption)=>{
         if(!selectedOption.value==""){
@@ -365,7 +380,30 @@ class EmployeeForm extends React.Component {
                     />
                     <span className="errCls">{this.state.skill2Err}</span>
                 </FormGroup>
-
+                <FormGroup>
+                    <Label for="certifiedFlag">Already Certified</Label>
+                    <RadioGroup
+                        name="certifiedFlag"
+                        selectedValue={this.state.certifiedFlag}
+                        onChange={this.handleCertifiedChg.bind(this)}>
+                        <label>
+                        <Radio value="yes" />Yes
+                        </label>
+                        <label>
+                        <Radio value="no" />No
+                        </label>
+                    </RadioGroup>
+                </FormGroup>
+                <FormGroup>
+                    <CheckboxGroup
+                        checkboxDepth={2} // This is needed to optimize the checkbox group
+                        name="certificationType"
+                        value={this.state.certificationType}
+                        onChange={this.handleCertTypeChg}>
+                        <label><Checkbox value="External"/> External</label>
+                        <label><Checkbox value="Internal"/> Internal</label>
+                    </CheckboxGroup>
+                </FormGroup>
                 <h5 className="succCls"> {this.state.messageFromServer}</h5>
                 <h5 className="errCls">{this.state.subMandatoryErr}</h5>
                 <Button color="success">Submit</Button>
