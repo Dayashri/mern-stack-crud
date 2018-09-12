@@ -1,6 +1,6 @@
 import React from 'react';
 import { Container,Button, Form, FormGroup, Label, Input } from 'reactstrap';
-import { RadioGroup, RadioButton } from 'react-radio-buttons';
+import { RadioGroup, Radio} from 'react-radio-group';
 import {Checkbox, CheckboxGroup} from 'react-checkbox-group';
 import 'rc-checkbox/assets/index.css';
 import Select from 'react-select';
@@ -113,7 +113,7 @@ class EmployeeForm extends React.Component {
 
     handlePortiFolioChange=(selectedOption)=>{
         var portifolioErr="";
-        if(!selectedOption.value==""){
+        if(!selectedOption.value=="" && selectedOption.value!=="--"){
             portifolioErr="";
             axios.get('/api/reskill/getOnlyPortifolio',{
                 params:{
@@ -136,12 +136,20 @@ class EmployeeForm extends React.Component {
                         messageFromServer:"",
                         DMOptions:DMOptions,selectedOptionP:selectedOption,
                         selectedOptionD:"",selectedOptionL:"",
-                        LObLeadOptions:[{label:"Please select Your DM",value:""}]
+                        LObLeadOptions:[{label:"Please select Your DM",value:"--"}]
                     });
                 }).catch(error => {
                     //console.log(error.response.data.error)
                 });
-        }else{
+        }else if(selectedOption.value==="--"){
+            portifolioErr="This field is Mandatory";
+            this.setState({
+                messageFromServer:"",
+                portifolioErr:portifolioErr,
+                selectedOptionP:''
+            });
+        }
+        else{
             portifolioErr="This field is Mandatory";
             this.setState({
                 messageFromServer:"",
@@ -151,7 +159,7 @@ class EmployeeForm extends React.Component {
     }
     handleDMChange = (selectedOption) => {
         var dmErr="";
-        if(!selectedOption.value==""){
+        if(!selectedOption.value=="" && selectedOption.value!=="--"){
             axios.get('/api/reskill/getOnlyPortifolio',{
                 params:{
                     name:this.state.selectedOptionP.value
@@ -178,7 +186,16 @@ class EmployeeForm extends React.Component {
                 }).catch(error => {
                     //console.log(error.response.data.error)
                 });
-        }else{
+        }else if(selectedOption.value==="--"){
+            dmErr="This field is Mandatory";
+            selectedOption='';
+            this.setState({
+                messageFromServer:"",
+                dmErr:dmErr,
+                selectedOptionD:selectedOption
+            });
+        }
+        else{
             dmErr="This field is Mandatory";
             this.setState({
                 messageFromServer:"",
@@ -191,14 +208,18 @@ class EmployeeForm extends React.Component {
         var lobErr="";
         if(selectedOption.value===""){
             lobErr="This field is Mandatory";
-        }else{
+        }else if(selectedOption.value==="--"){
+            lobErr="This field is Mandatory";
+            selectedOption='';
+        }
+        else{
             lobErr="";
         }
         this.setState({lobErr:lobErr, messageFromServer:"",selectedOptionL:selectedOption});
     }
 
     handleGrpChange=(selectedOption) =>{
-        if(!selectedOption.value==""){
+        if(!selectedOption.value=="" && selectedOption.value!=="--"){
             axios.get('/api/reskill/getOneSkillGroup',{
                 params:{
                     name:selectedOption.value
@@ -219,12 +240,19 @@ class EmployeeForm extends React.Component {
                         compGrpOptions:compGrpOptions,
                         selectedOptionG:selectedOption,
                         selectedOptionC:'',selectedOptionS:'',
-                        skillGrpOptions:[{label:"Please select Your Component",value:""}]
+                        skillGrpOptions:[{label:"Please select Your Component",value:"--"}]
                     });
                 }).catch(error => {
                     //console.log(error.response.data.error)
                 });
-        }else{
+        }else if(selectedOption.value==="--"){
+            this.setState({
+                messageFromServer:"",
+                groupErr:"This field is Mandatory",
+                selectedOptionG:''
+            })
+        }
+        else{
             this.setState({
                 messageFromServer:"",
                 groupErr:"This field is Mandatory"
@@ -233,7 +261,7 @@ class EmployeeForm extends React.Component {
     }
 
     handleCompChange = (selectedOption) => {
-        if(!selectedOption.value==""){
+        if(!selectedOption.value=="" && selectedOption.value!=="--"){
             axios.get('/api/reskill/getOneComponentSkill',{
                 params:{
                     cName:selectedOption.value,
@@ -257,7 +285,14 @@ class EmployeeForm extends React.Component {
                 }).catch(error => {
                     //console.log(error.response.data.error)
                 });
-        }else{
+        }else if(selectedOption.value==="--"){
+            this.setState({
+                messageFromServer:"",
+                compErr:"This field is Mandatory",
+                selectedOptionC:''
+            });
+        }
+        else{
             this.setState({
                 messageFromServer:"",
                 compErr:"This field is Mandatory"
@@ -267,8 +302,11 @@ class EmployeeForm extends React.Component {
 
     handleSkillChange = (selectedOption) => {
         var skillErr="";
-        if(selectedOption.value!==""){
+        if(selectedOption.value!=="" && selectedOption.value!=="--"){
             skillErr="";
+        }else if(selectedOption.value==="--"){
+            selectedOption='';
+            skillErr="This field is Mandatory";
         }else{
             skillErr="This field is Mandatory";
         }
@@ -322,11 +360,17 @@ class EmployeeForm extends React.Component {
         var emailFlag=this.state.emailErr.length===0 && this.state.empEmail!=="";
         var empIdFlag=this.state.empErr.length===0 && this.state.empId!=="";
         var portifolioFlag=this.state.portifolioErr.length===0 && this.state.selectedOptionP.value!=="";
-        var dmFlag=this.state.dmErr.length===0 && this.state.selectedOptionD.value!=="";
-        var lobFlag=this.state.lobErr.length===0 && this.state.selectedOptionL.value!=="";
+        var dmFlag=this.state.dmErr.length===0 && this.state.selectedOptionD.value!=="" 
+                    && this.state.selectedOptionD.label!=="Please select Your Portfolio";
+        var lobFlag=this.state.lobErr.length===0 && this.state.selectedOptionL.value!==""
+            && this.state.selectedOptionL.label!=="Please select Your Portfolio" 
+            && this.state.selectedOptionL.label!=="Please select Your DM";
         var groupFlag=this.state.groupErr.length===0 && this.state.selectedOptionG.value!=="";
-        var compFlag=this.state.compErr.length===0 && this.state.selectedOptionC.value!=="";
-        var skillsFlag=this.state.skillErr.length===0 && this.state.selectedOptionS.value!=="";
+        var compFlag=this.state.compErr.length===0 && this.state.selectedOptionC.value!==""
+                && this.state.selectedOptionC.label!=="Please select Your Group";
+        var skillsFlag=this.state.skillErr.length===0 && this.state.selectedOptionS.value!==""
+                && this.state.selectedOptionS.label!=="Please select Your Group"
+                && this.state.selectedOptionS.label!=="Please select Your Component";
         var certifiedFlag=this.state.certifiedErr.length===0 && this.state.certifiedFlag!=="";
         if(emailFlag&&empIdFlag&&portifolioFlag&&dmFlag&&lobFlag && groupFlag &&
             compFlag&& skillsFlag&& certifiedFlag){
@@ -343,39 +387,43 @@ class EmployeeForm extends React.Component {
                 Certified:this.state.certifiedFlag,
                 certificationType:this.state.certificationType,
                 certifyBfTime:this.state.certBfTimeFlag,
-                certificationDate:this.certificationDate,
+                certificationDate:this.state.startDate,
             }
             axios.post('/api/reskill/addSkill',querystring).then(response =>{
                 this.setState({
                     messageFromServer: response.data,
                     selectedOptionP:'',
-        selectedOptionD: '',
-        selectedOptionL: '',
-        selectedOptionG:'',
-        selectedOptionC: '',
-        selectedOptionS: '',
-		certifiedFlag:'',
-        certificationType:[],
-        certBfTimeFlag:'',
-        certificationDt:null,
-        disableCertBfTimeFlag:true,
-        disableCertBfTimeDt:true,
-        disableCertFlag:true,
-        disableCertTimeFlag:true,
-        disableCalendar:true,
-        startDate: null,
-        empEmail:'',
-        emailErr:'',
-        empId:'',
-        empErr:'',
-        portifolioErr:'',
-        dmErr:'',
-        lobErr:"",
-        groupErr:'',
-        compErr:'',
-        skillErr:"",
-        certifiedErr:"",
-        subMandatoryErr:''
+                    selectedOptionD: '',
+                    selectedOptionL: '',
+                    selectedOptionG:'',
+                    selectedOptionC: '',
+                    selectedOptionS: '',
+                    certifiedFlag:'',
+                    certificationType:[],
+                    certBfTimeFlag:'',
+                    certificationDt:null,
+                    disableCertBfTimeFlag:true,
+                    disableCertBfTimeDt:true,
+                    disableCertFlag:true,
+                    disableCertTimeFlag:true,
+                    disableCalendar:true,
+                    startDate: null,
+                    empEmail:'',
+                    emailErr:'',
+                    empId:'',
+                    empErr:'',
+                    portifolioErr:'',
+                    dmErr:'',
+                    lobErr:"",
+                    groupErr:'',
+                    compErr:'',
+                    skillErr:"",
+                    certifiedErr:"",
+                    subMandatoryErr:'',
+                    DMOptions:[{label:"Please select Your Portfolio",value:"--"}],
+                    LObLeadOptions:[{label:"Please select Your Portfolio",value:"--"}],
+                    compGrpOptions:[{label:"Please select Your Group",value:"--"}],
+                    skillGrpOptions:[{label:"Please select Your Group",value:"--"}]
                 });
             }).catch(error => {
                 //console.log(error.response.data.error)
@@ -398,8 +446,8 @@ class EmployeeForm extends React.Component {
                 this.setState({
                     portifolioOptions: portifolioOptions,
                     
-                    DMOptions:[{label:"Please select Your Portifolio",value:""}],
-                    LObLeadOptions:[{label:"Please select Your Portifolio",value:""}]
+                    DMOptions:[{label:"Please select Your Portfolio",value:"--"}],
+                    LObLeadOptions:[{label:"Please select Your Portfolio",value:"--"}]
                 });
             }).catch(error => {
                 //console.log(error.response.data.error)
@@ -412,8 +460,8 @@ class EmployeeForm extends React.Component {
                 });
                 this.setState({
                     grpOptions: grpOptions,
-                    compGrpOptions:[{label:"Please select Your Group",value:""}],
-                    skillGrpOptions:[{label:"Please select Your Group",value:""}]
+                    compGrpOptions:[{label:"Please select Your Group",value:"--"}],
+                    skillGrpOptions:[{label:"Please select Your Group",value:"--"}]
                 });
             }).catch(error => {
                     //console.log(error.response.data.error)
@@ -441,7 +489,7 @@ class EmployeeForm extends React.Component {
                     <span className="errCls">{this.state.emailErr}</span>
                 </FormGroup>
                 <FormGroup>
-                    <Label for="portifolio">Portifolio</Label>
+                    <Label for="portifolio">Portfolio</Label>
                     <Select ref="portifolio"
                         value={selectedOptionP}
                         options={this.state.portifolioOptions}
@@ -449,6 +497,7 @@ class EmployeeForm extends React.Component {
                         isSearchable={false}
                         onChange={this.handlePortiFolioChange}
                     />
+                    <span className="errCls">{this.state.portifolioErr}</span>
                 </FormGroup>
                 <FormGroup>
                     <Label for="dm">DM</Label>
@@ -459,7 +508,7 @@ class EmployeeForm extends React.Component {
                         isSearchable={false}
                         onChange={this.handleDMChange}
                     />
-                    <span className="errCls">{this.state.skill1Err}</span>
+                    <span className="errCls">{this.state.dmErr}</span>
                 </FormGroup>
                 <FormGroup>
                     <Label for="lob">LOB</Label>
@@ -470,7 +519,7 @@ class EmployeeForm extends React.Component {
                         onChange={this.handleLobChange}
                         options={this.state.LObLeadOptions}
                     />
-                    <span className="errCls">{this.state.skill2Err}</span>
+                    <span className="errCls">{this.state.lobErr}</span>
                 </FormGroup>
 
                 <FormGroup>
@@ -482,7 +531,7 @@ class EmployeeForm extends React.Component {
                         onChange={this.handleGrpChange}
                         options={this.state.grpOptions}
                     />
-                    <span className="errCls">{this.state.skill2Err}</span>
+                    <span className="errCls">{this.state.groupErr}</span>
                 </FormGroup>
 
                 <FormGroup>
@@ -494,7 +543,7 @@ class EmployeeForm extends React.Component {
                         onChange={this.handleCompChange}
                         options={this.state.compGrpOptions}
                     />
-                    <span className="errCls">{this.state.skill2Err}</span>
+                    <span className="errCls">{this.state.compErr}</span>
                 </FormGroup>
 
                 <FormGroup>
@@ -506,23 +555,25 @@ class EmployeeForm extends React.Component {
                         onChange={this.handleSkillChange}
                         options={this.state.skillGrpOptions}
                     />
-                    <span className="errCls">{this.state.skill2Err}</span>
+                    <span className="errCls">{this.state.skillErr}</span>
                 </FormGroup>
                 <FormGroup>
                     <Label for="certifiedFlag">Already Certified</Label>
                     <RadioGroup
                         name="certifiedFlag"
                         selectedValue={this.state.certifiedFlag}
-                        onChange={this.handleCertifiedChg.bind(this)} horizontal>
-                        <RadioButton value="Yes" rootColor="black" pointColor="black" iconSize={ 20 } iconInnerSize={ 15 }>
-                        Yes
-                        </RadioButton>
-                        <RadioButton value="No"  rootColor="black"  pointColor="black" iconSize={ 20 } iconInnerSize={ 15 }>
-                        No
-                        </RadioButton>
+                        onChange={this.handleCertifiedChg.bind(this)}>
+                        <label>
+                            <Radio value="Yes"/>Yes
+                        </label>&emsp;&emsp;
+                        <label>
+                            <Radio value="No"/>No
+                        </label>
                     </RadioGroup>
+                    <span className="errCls">{this.state.certifiedErr}</span>
                 </FormGroup>
-                <FormGroup>
+                <FormGroup style={{display:(!this.state.disableCertFlag?'block':'none')}}>
+                    <Label for="certificationType">If Certifified, Yes</Label>
                     <CheckboxGroup
                         checkboxDepth={2} // This is needed to optimize the checkbox group
                         name="certificationType"
@@ -532,20 +583,20 @@ class EmployeeForm extends React.Component {
                         <label><Checkbox value="Internal" disabled={this.state.disableCertFlag}/> Internal</label>
                     </CheckboxGroup>
                 </FormGroup>
-                <FormGroup>
+                <FormGroup style={{display:(!this.state.disableCertTimeFlag?'block':'none')}}>
                     <Label for="certBfTimeFlag">If no, Will you Certify Before Nov 2018</Label>
-                    <RadioGroup onChange={this.handleCertBfTimeFlagChg.bind(this)} horizontal
-                        name="certBfTimeFlag" value={this.state.certBfTimeFlag}
+                    <RadioGroup onChange={this.handleCertBfTimeFlagChg.bind(this)}
+                        name="certBfTimeFlag" selectedValue={this.state.certBfTimeFlag}
                         >
-                        <RadioButton disabled={this.state.disableCertTimeFlag} iconSize={ 20 } iconInnerSize={ 15 } rootColor="black"  disabledColor="grey"  pointColor="black" value="Yes">
-                        Yes
-                        </RadioButton>
-                        <RadioButton disabled={this.state.disableCertTimeFlag} rootColor="black" iconSize={ 20 } iconInnerSize={ 15 } disabledColor="grey" pointColor="black" value="No">
-                        No
-                        </RadioButton>
+                        <label>
+                            <Radio value="Yes"/>Yes
+                        </label>&emsp;&emsp;
+                        <label>
+                            <Radio value="No"/>No
+                        </label>
                     </RadioGroup>
                 </FormGroup>
-                <FormGroup>
+                <FormGroup style={{display:(!this.state.disableCalendar?'block':'none')}}>
                     <Label for="certBfTimeFlag">If no, enter the Time Period</Label>
                     <DatePicker
                         minDate={moment()}
