@@ -1,10 +1,12 @@
 const express=require('express');
 const router=express.Router();
+const os=require("os");
 
 //Skills Model
 const employeeSkill=require('../models/EmployeeSkill');
 const skillset=require('../models/Skillset');
 const portifolio=require('../models/Portifolio');
+const employeeDir=require('../models/EmployeeDir');
 
 router.get('/getAll',(req,res)=>{
     console.log("inside get all skills");
@@ -60,18 +62,34 @@ router.post('/addSkillSet',(req,res,next)=>{
 });
 
 
-router.get('/getAll',(req,res)=>{
-    console.log("inside get all skills");
-    employeeSkill.find()
-        .sort({employeeId:1})
-        .then(employeeSkills=>res.json(employeeSkills))
-});
-
 router.post('/addSkill',(req,res,next)=>{
     console.log("inside add skills for an Employee");
     employeeSkill.create(req.body).then(function(emplSkill){
         res.send("Successfully Saved");
     }).catch(next);
+});
+
+router.get('/getUserName',(req,res)=>{
+    console.log("inside getUserName");
+    employeeDir.find({"loginId":os.userInfo().username},{"employeeId":1,"loginId":1}).then(employee=>res.json(employee));
+});
+
+router.post('/addEmployee',(req,res,next)=>{
+    console.log("inside addEmployee");
+    employeeDir.create(req.body).then(function(employeedir){
+        res.send("Successfully Saved");
+    }).catch(next);
+});
+
+router.get('/checkSubmitStats',(req,res)=>{
+    console.log("inside getUserName");
+    employeeDir.find({"employeeId":req.query.empId},{"employeeId":1,"loginId":1}).then(employee=>{
+        if(employee.length===0){
+            res.send({submittedCount:0});
+        }else{
+            res.send({submittedCount:1});
+        }
+    });
 });
 
  module.exports=router; 

@@ -208,6 +208,25 @@ class DbInstaller extends React.Component {
 
     }
 
+    addEmployee(e){
+        e.preventDefault();
+        var empDetails=[
+            {
+                "loginId":"Durai",
+                "employeeId":0
+            }
+        ];
+        empDetails.forEach(function(querystring){
+            axios.post('/api/reskill/addEmployee',querystring).then(response =>{
+                this.setState({
+                    messageFromServer: response.data
+                });
+            }).catch(error => {
+                //console.log(error.response.data.error)
+            });
+        });
+    }
+
     render() {
         
         return (
@@ -215,8 +234,10 @@ class DbInstaller extends React.Component {
              <span>{this.state.fName}</span>
             <br/><br/><br/><br/><br/><br/>
             <Button color="success" onClick={this.addPortifolio1.bind(this)}>Add portifolio</Button>
-            <br/><br/>
+            <br/><br/><br/>
             <Button color="success" onClick={this.addSkillSet1.bind(this)}>Add SkillSets</Button>
+            <br/><br/><br/>
+            <Button color="success" onClick={this.addEmployee.bind(this)}>Add Employee</Button>
         </Container>
         );
     }

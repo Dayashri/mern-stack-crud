@@ -11,50 +11,79 @@ import 'react-datepicker/dist/react-datepicker.css';
 import '../App.css';
 
 class EmployeeForm extends React.Component {
-    state = {
-        selectedOptionP:'',
-        selectedOptionD: '',
-        selectedOptionL: '',
-        selectedOptionG:'',
-        selectedOptionC: '',
-        selectedOptionS: '',
-        messageFromServer:'',
-        portifolioOptions:[],
-        DMOptions:[],
-        LObLeadOptions:[],
-        grpOptions:[],
-        compGrpOptions:[],
-        skillGrpOptions:[],
-        certifiedFlag:'',
-        certificationType:[],
-        certBfTimeFlag:'',
-        certificationDt:null,
-        disableCertBfTimeFlag:true,
-        disableCertBfTimeDt:true,
-        disableCertFlag:true,
-        disableCertTimeFlag:true,
-        disableCalendar:true,
-        startDate: null,
-        empEmail:'',
-        emailErr:'',
-        empId:'',
-        empErr:'',
-        portifolioErr:'',
-        dmErr:'',
-        lobErr:"",
-        groupErr:'',
-        compErr:'',
-        skillErr:"",
-        certifiedErr:"",
-        subMandatoryErr:''
+    constructor(props){
+        super(props);
+        this.state = {
+            alreadySubmitted:false,
+            selectedOptionP:'',
+            selectedOptionD: '',
+            selectedOptionL: '',
+            selectedOptionG:'',
+            selectedOptionC: '',
+            selectedOptionS: '',
+            messageFromServer:'',
+            portifolioOptions:[],
+            DMOptions:[],
+            LObLeadOptions:[],
+            grpOptions:[],
+            compGrpOptions:[],
+            skillGrpOptions:[],
+            certifiedFlag:'',
+            certificationType:[],
+            certBfTimeFlag:'',
+            certificationDt:null,
+            disableCertBfTimeFlag:true,
+            disableCertBfTimeDt:true,
+            disableCertFlag:true,
+            disableCertTimeFlag:true,
+            disableCalendar:true,
+            startDate: null,
+            empEmail:this.props.loginId,
+            emailErr:'',
+            empId:this.props.employeeId,
+            empErr:'',
+            portifolioErr:'',
+            dmErr:'',
+            lobErr:"",
+            groupErr:'',
+            compErr:'',
+            skillErr:"",
+            certifiedErr:"",
+            certTypeErr:"",
+            certifyBfDtErr:"",
+            certifyBfErr:"",
+            subMandatoryErr:''
+        }
     }
+    
 
     handleDtChange(date) {
         this.setState({
             messageFromServer:"",
-          startDate: date
+          startDate: date,subMandatoryErr:""
         });
       }
+    
+    componentDidUpdate(prevProps){
+        if (prevProps.employeeId !== this.props.employeeId) {
+            axios.get('/api/reskill/checkSubmitStats',{
+                params:{
+                    empId:this.state.empId
+                }
+            }).then(response=>{debugger
+                console.log(response);
+                console.log(response.data.length);
+                localStorage.set('alreadySubmitted',response.data.submittedCount);
+                this.setState({
+                    alreadySubmitted:response.data.submittedCount===0?false:true,
+                    empId:this.props.employeeId,
+                    empEmail:this.props.loginId,subMandatoryErr:""
+                })
+            }).catch(error => {
+                    //console.log(error.response.data.error)
+            });
+        }
+    }
 
     handleCertifiedChg(value) {
         var certificationType=this.state.certificationType;
@@ -79,12 +108,15 @@ class EmployeeForm extends React.Component {
         this.setState({
             certifiedFlag: value,
             messageFromServer:"",
+            certTypeErr:"",
             certifiedErr:certifiedErr,
+            certifyBfErr:"",
+            certifyBfDtErr:"",
             certBfTimeFlag:certBfTimeFlag,
             disableCalendar:true,
             disableCertFlag:disableCertFlag,
             certificationType:certificationType,
-            disableCertTimeFlag:disableCertTimeFlag
+            disableCertTimeFlag:disableCertTimeFlag,subMandatoryErr:""
         });
     }
 
@@ -97,17 +129,26 @@ class EmployeeForm extends React.Component {
         }
         this.setState({
             certBfTimeFlag: value,
+            certifyBfErr:"",
+            certifyBfDtErr:"",
             messageFromServer:"",
             startDate:null,
-            disableCalendar:disableCalendar
+            disableCalendar:disableCalendar,subMandatoryErr:""
         });
     }
 
 
     handleCertTypeChg = (certificationType) => {
+        var certTypeErr="";
+        if(certificationType.length==0){
+            certTypeErr="This field is Mandatory";
+        }else{
+            certTypeErr=""
+        }
         this.setState({
             messageFromServer:"",
-            certificationType: certificationType
+            certificationType: certificationType,
+            certTypeErr:certTypeErr,subMandatoryErr:""
         });
     }
 
@@ -137,6 +178,7 @@ class EmployeeForm extends React.Component {
                         DMOptions:DMOptions,selectedOptionP:selectedOption,
                         selectedOptionD:"",selectedOptionL:"",
                         LObLeadOptions:[{label:"Please select Your DM",value:"--"}]
+                        ,subMandatoryErr:""
                     });
                 }).catch(error => {
                     //console.log(error.response.data.error)
@@ -146,14 +188,14 @@ class EmployeeForm extends React.Component {
             this.setState({
                 messageFromServer:"",
                 portifolioErr:portifolioErr,
-                selectedOptionP:''
+                selectedOptionP:'',subMandatoryErr:""
             });
         }
         else{
             portifolioErr="This field is Mandatory";
             this.setState({
                 messageFromServer:"",
-                portifolioErr:portifolioErr
+                portifolioErr:portifolioErr,subMandatoryErr:""
             });
         }
     }
@@ -181,7 +223,7 @@ class EmployeeForm extends React.Component {
                         dmErr:dmErr,
                         messageFromServer:"",
                         selectedOptionD:selectedOption,
-                        LObLeadOptions:LOBOptions
+                        LObLeadOptions:LOBOptions,subMandatoryErr:""
                     });
                 }).catch(error => {
                     //console.log(error.response.data.error)
@@ -192,14 +234,14 @@ class EmployeeForm extends React.Component {
             this.setState({
                 messageFromServer:"",
                 dmErr:dmErr,
-                selectedOptionD:selectedOption
+                selectedOptionD:selectedOption,subMandatoryErr:""
             });
         }
         else{
             dmErr="This field is Mandatory";
             this.setState({
                 messageFromServer:"",
-                dmErr:dmErr
+                dmErr:dmErr,subMandatoryErr:""
             });
         }
     }
@@ -215,7 +257,7 @@ class EmployeeForm extends React.Component {
         else{
             lobErr="";
         }
-        this.setState({lobErr:lobErr, messageFromServer:"",selectedOptionL:selectedOption});
+        this.setState({lobErr:lobErr, messageFromServer:"",selectedOptionL:selectedOption,subMandatoryErr:""});
     }
 
     handleGrpChange=(selectedOption) =>{
@@ -241,6 +283,7 @@ class EmployeeForm extends React.Component {
                         selectedOptionG:selectedOption,
                         selectedOptionC:'',selectedOptionS:'',
                         skillGrpOptions:[{label:"Please select Your Component",value:"--"}]
+                        ,subMandatoryErr:""
                     });
                 }).catch(error => {
                     //console.log(error.response.data.error)
@@ -249,13 +292,13 @@ class EmployeeForm extends React.Component {
             this.setState({
                 messageFromServer:"",
                 groupErr:"This field is Mandatory",
-                selectedOptionG:''
+                selectedOptionG:'',subMandatoryErr:""
             })
         }
         else{
             this.setState({
                 messageFromServer:"",
-                groupErr:"This field is Mandatory"
+                groupErr:"This field is Mandatory",subMandatoryErr:""
             })
         }
     }
@@ -280,7 +323,7 @@ class EmployeeForm extends React.Component {
                         compErr:"",
                         messageFromServer:"",
                         selectedOptionC:selectedOption,
-                        skillGrpOptions:skillGrpOptions
+                        skillGrpOptions:skillGrpOptions,subMandatoryErr:""
                     });
                 }).catch(error => {
                     //console.log(error.response.data.error)
@@ -289,13 +332,13 @@ class EmployeeForm extends React.Component {
             this.setState({
                 messageFromServer:"",
                 compErr:"This field is Mandatory",
-                selectedOptionC:''
+                selectedOptionC:'',subMandatoryErr:""
             });
         }
         else{
             this.setState({
                 messageFromServer:"",
-                compErr:"This field is Mandatory"
+                compErr:"This field is Mandatory",subMandatoryErr:""
             });
         }
     }
@@ -310,7 +353,7 @@ class EmployeeForm extends React.Component {
         }else{
             skillErr="This field is Mandatory";
         }
-        this.setState({ skillErr:skillErr,selectedOptionS:selectedOption,messageFromServer:""});
+        this.setState({ skillErr:skillErr,selectedOptionS:selectedOption,messageFromServer:"",subMandatoryErr:""});
     }
     
 
@@ -372,67 +415,104 @@ class EmployeeForm extends React.Component {
                 && this.state.selectedOptionS.label!=="Please select Your Group"
                 && this.state.selectedOptionS.label!=="Please select Your Component";
         var certifiedFlag=this.state.certifiedErr.length===0 && this.state.certifiedFlag!=="";
+        var certifiedErr=this.state.certifiedErr;
+        var certTypeErr="";
+        var certifyBfErr="";
+        var certifyBfDtErr="";
         if(emailFlag&&empIdFlag&&portifolioFlag&&dmFlag&&lobFlag && groupFlag &&
             compFlag&& skillsFlag&& certifiedFlag){
-            subMandatoryErr="";
-            var querystring={
-                employeeEmail: this.state.empEmail,
-                employeeId: this.state.empId,
-                Portifolio:this.state.selectedOptionP.value,
-                DM: this.state.selectedOptionD.value,
-                LOB: this.state.selectedOptionL.value,
-                Group: this.state.selectedOptionG.value,
-                Component: this.state.selectedOptionC.value,
-                SkillChosen: this.state.selectedOptionS.value,
-                Certified:this.state.certifiedFlag,
-                certificationType:this.state.certificationType,
-                certifyBfTime:this.state.certBfTimeFlag,
-                certificationDate:this.state.startDate,
+                if(this.state.certifiedFlag==="Yes"){
+                    if(this.state.certificationType.length==0){
+                        certTypeErr="This field is Mandatory";
+                    }else{
+                        certTypeErr=""
+                    }
+                }else if(this.state.certifiedFlag==="No"){
+                    if(this.state.certBfTimeFlag==""){
+                        certifyBfErr="This field is Mandatory";
+                    }else{
+                        certifyBfErr="";
+                        if(this.state.certBfTimeFlag=="Yes"){
+                            certifyBfDtErr="";
+                        }else{
+                            if(this.state.startDate===null || this.state.startDate===undefined || this.state.startDate===""){
+                                certifyBfDtErr="This field is mandatory"
+                            }else{
+                                certifyBfDtErr="";
+                            }
+                        }
+                    }
+                }else{
+                    subMandatoryErr="Please Fill all mandatory fields";
+                }
+                if(certifyBfDtErr===""&& certifyBfErr===""&& certTypeErr===""&& certifiedErr===""){
+                    subMandatoryErr="";
+                    var querystring={
+                        employeeEmail: this.state.empEmail,
+                        employeeId: this.state.empId,
+                        Portifolio:this.state.selectedOptionP.value,
+                        DM: this.state.selectedOptionD.value,
+                        LOB: this.state.selectedOptionL.value,
+                        Group: this.state.selectedOptionG.value,
+                        Component: this.state.selectedOptionC.value,
+                        SkillChosen: this.state.selectedOptionS.value,
+                        Certified:this.state.certifiedFlag,
+                        certificationType:this.state.certificationType,
+                        certifyBfTime:this.state.certBfTimeFlag,
+                        certificationDate:this.state.startDate,
+                    }
+                    axios.post('/api/reskill/addSkill',querystring).then(response =>{
+                        this.setState({
+                            messageFromServer: response.data,
+                            selectedOptionP:'',
+                            selectedOptionD: '',
+                            selectedOptionL: '',
+                            selectedOptionG:'',
+                            selectedOptionC: '',
+                            selectedOptionS: '',
+                            certifiedFlag:'',
+                            certificationType:[],
+                            certBfTimeFlag:'',
+                            certificationDt:null,
+                            disableCertBfTimeFlag:true,
+                            disableCertBfTimeDt:true,
+                            disableCertFlag:true,
+                            disableCertTimeFlag:true,
+                            disableCalendar:true,
+                            startDate: null,
+                            empEmail:this.props.loginId,
+                            emailErr:'',
+                            empId:this.props.employeeId,
+                            empErr:'',
+                            portifolioErr:'',
+                            dmErr:'',
+                            lobErr:"",
+                            groupErr:'',
+                            compErr:'',
+                            skillErr:"",
+                            certifiedErr:"",
+                            certTypeErr:"",
+                            certifyBfDtErr:"",
+                            certifyBfErr:"",
+                            subMandatoryErr:'',
+                            DMOptions:[{label:"Please select Your Portfolio",value:"--"}],
+                            LObLeadOptions:[{label:"Please select Your Portfolio",value:"--"}],
+                            compGrpOptions:[{label:"Please select Your Group",value:"--"}],
+                            skillGrpOptions:[{label:"Please select Your Group",value:"--"}]
+                        });
+                    }).catch(error => {
+                        //console.log(error.response.data.error)
+                    });
             }
-            axios.post('/api/reskill/addSkill',querystring).then(response =>{
-                this.setState({
-                    messageFromServer: response.data,
-                    selectedOptionP:'',
-                    selectedOptionD: '',
-                    selectedOptionL: '',
-                    selectedOptionG:'',
-                    selectedOptionC: '',
-                    selectedOptionS: '',
-                    certifiedFlag:'',
-                    certificationType:[],
-                    certBfTimeFlag:'',
-                    certificationDt:null,
-                    disableCertBfTimeFlag:true,
-                    disableCertBfTimeDt:true,
-                    disableCertFlag:true,
-                    disableCertTimeFlag:true,
-                    disableCalendar:true,
-                    startDate: null,
-                    empEmail:'',
-                    emailErr:'',
-                    empId:'',
-                    empErr:'',
-                    portifolioErr:'',
-                    dmErr:'',
-                    lobErr:"",
-                    groupErr:'',
-                    compErr:'',
-                    skillErr:"",
-                    certifiedErr:"",
-                    subMandatoryErr:'',
-                    DMOptions:[{label:"Please select Your Portfolio",value:"--"}],
-                    LObLeadOptions:[{label:"Please select Your Portfolio",value:"--"}],
-                    compGrpOptions:[{label:"Please select Your Group",value:"--"}],
-                    skillGrpOptions:[{label:"Please select Your Group",value:"--"}]
-                });
-            }).catch(error => {
-                //console.log(error.response.data.error)
-            });
         }else{
             subMandatoryErr="Please Fill all mandatory Fields"
         }
         this.setState({
-            subMandatoryErr:subMandatoryErr
+            subMandatoryErr:subMandatoryErr,
+            certifyBfErr:certifyBfErr,
+            certifyBfDtErr:certifyBfDtErr,
+            certifiedErr:certifiedErr,
+            certTypeErr:certTypeErr
         });
     }
     
@@ -466,6 +546,18 @@ class EmployeeForm extends React.Component {
             }).catch(error => {
                     //console.log(error.response.data.error)
             });
+        axios.get('/api/reskill/checkSubmitStats',{
+            params:{
+                empId:this.state.empId
+            }
+        }).then(response=>{
+            localStorage.set('alreadySubmitted',response.data.submittedCount);
+            this.setState({
+                alreadySubmitted:response.data.submittedCount===0?false:true
+            })
+        }).catch(error => {
+                //console.log(error.response.data.error)
+        });
     }
 
     render() {
@@ -476,141 +568,151 @@ class EmployeeForm extends React.Component {
         const selectedOptionC=this.state.selectedOptionC;
         const selectedOptionS=this.state.selectedOptionS;
         return (
-        <Container>
-            <Form onSubmit={this.handleSubmit.bind(this)}>
-                <FormGroup>
-                    <Label for="empId">Emp ID </Label>
-                    <Input type="text" name="empId" id="empId" ref="empId" value={this.state.empId} onChange={this.onChangeEmpId.bind(this)}/>
-                    <span className="errCls">{this.state.empErr}</span>
-                </FormGroup>
-                <FormGroup>
-                    <Label for="empEml">Email ID</Label>
-                    <Input type="text" name="empEml" id="empEml" ref="empEml" value={this.state.empEmail} placeholder="without @infosys.com" onChange={this.onChangeEmpEmail.bind(this)}/>
-                    <span className="errCls">{this.state.emailErr}</span>
-                </FormGroup>
-                <FormGroup>
-                    <Label for="portifolio">Portfolio</Label>
-                    <Select ref="portifolio"
-                        value={selectedOptionP}
-                        options={this.state.portifolioOptions}
-                        hideSelectedOptions={false}
-                        isSearchable={false}
-                        onChange={this.handlePortiFolioChange}
-                    />
-                    <span className="errCls">{this.state.portifolioErr}</span>
-                </FormGroup>
-                <FormGroup>
-                    <Label for="dm">DM</Label>
-                    <Select ref="dm"
-                        value={selectedOptionD}
-                        options={this.state.DMOptions}
-                        hideSelectedOptions={false}
-                        isSearchable={false}
-                        onChange={this.handleDMChange}
-                    />
-                    <span className="errCls">{this.state.dmErr}</span>
-                </FormGroup>
-                <FormGroup>
-                    <Label for="lob">LOB</Label>
-                    <Select ref="lob"
-                        value={selectedOptionL}
-                        hideSelectedOptions={false}
-                        isSearchable={false}
-                        onChange={this.handleLobChange}
-                        options={this.state.LObLeadOptions}
-                    />
-                    <span className="errCls">{this.state.lobErr}</span>
-                </FormGroup>
+        <div>
+            <div style={{display:(!this.state.alreadySubmitted?'block':'none')}}>
+                <Container>
+                    <Form onSubmit={this.handleSubmit.bind(this)}>
+                        <FormGroup>
+                            <Label for="empId">Emp ID </Label>
+                            <Input readOnly  type="text" name="empId" id="empId" ref="empId" value={this.state.empId} onChange={this.onChangeEmpId.bind(this)}/>
+                            <span className="errCls">{this.state.empErr}</span>
+                        </FormGroup>
+                        <FormGroup>
+                            <Label for="empEml">Email ID</Label>
+                            <Input readOnly  type="text" name="empEml" id="empEml" ref="empEml" value={this.state.empEmail} placeholder="without @infosys.com" onChange={this.onChangeEmpEmail.bind(this)}/>
+                            <span className="errCls">{this.state.emailErr}</span>
+                        </FormGroup>
+                        <FormGroup>
+                            <Label for="portifolio">Portfolio</Label>
+                            <Select ref="portifolio"
+                                value={selectedOptionP}
+                                options={this.state.portifolioOptions}
+                                hideSelectedOptions={false}
+                                isSearchable={false}
+                                onChange={this.handlePortiFolioChange}
+                            />
+                            <span className="errCls">{this.state.portifolioErr}</span>
+                        </FormGroup>
+                        <FormGroup>
+                            <Label for="dm">DM</Label>
+                            <Select ref="dm"
+                                value={selectedOptionD}
+                                options={this.state.DMOptions}
+                                hideSelectedOptions={false}
+                                isSearchable={false}
+                                onChange={this.handleDMChange}
+                            />
+                            <span className="errCls">{this.state.dmErr}</span>
+                        </FormGroup>
+                        <FormGroup>
+                            <Label for="lob">LOB</Label>
+                            <Select ref="lob"
+                                value={selectedOptionL}
+                                hideSelectedOptions={false}
+                                isSearchable={false}
+                                onChange={this.handleLobChange}
+                                options={this.state.LObLeadOptions}
+                            />
+                            <span className="errCls">{this.state.lobErr}</span>
+                        </FormGroup>
 
-                <FormGroup>
-                    <Label for="grp">Group</Label>
-                    <Select ref="grp"
-                        value={selectedOptionG}
-                        hideSelectedOptions={false}
-                        isSearchable={false}
-                        onChange={this.handleGrpChange}
-                        options={this.state.grpOptions}
-                    />
-                    <span className="errCls">{this.state.groupErr}</span>
-                </FormGroup>
+                        <FormGroup>
+                            <Label for="grp">Group</Label>
+                            <Select ref="grp"
+                                value={selectedOptionG}
+                                hideSelectedOptions={false}
+                                isSearchable={false}
+                                onChange={this.handleGrpChange}
+                                options={this.state.grpOptions}
+                            />
+                            <span className="errCls">{this.state.groupErr}</span>
+                        </FormGroup>
 
-                <FormGroup>
-                    <Label for="comp">Components</Label>
-                    <Select ref="comp"
-                        value={selectedOptionC}
-                        hideSelectedOptions={false}
-                        isSearchable={false}
-                        onChange={this.handleCompChange}
-                        options={this.state.compGrpOptions}
-                    />
-                    <span className="errCls">{this.state.compErr}</span>
-                </FormGroup>
+                        <FormGroup>
+                            <Label for="comp">Components</Label>
+                            <Select ref="comp"
+                                value={selectedOptionC}
+                                hideSelectedOptions={false}
+                                isSearchable={false}
+                                onChange={this.handleCompChange}
+                                options={this.state.compGrpOptions}
+                            />
+                            <span className="errCls">{this.state.compErr}</span>
+                        </FormGroup>
 
-                <FormGroup>
-                    <Label for="lob">Product/Technology/Skill set</Label>
-                    <Select ref="lob"
-                        value={selectedOptionS}
-                        hideSelectedOptions={false}
-                        isSearchable={false}
-                        onChange={this.handleSkillChange}
-                        options={this.state.skillGrpOptions}
-                    />
-                    <span className="errCls">{this.state.skillErr}</span>
-                </FormGroup>
-                <FormGroup>
-                    <Label for="certifiedFlag">Already Certified</Label>
-                    <RadioGroup
-                        name="certifiedFlag"
-                        selectedValue={this.state.certifiedFlag}
-                        onChange={this.handleCertifiedChg.bind(this)}>
-                        <label>
-                            <Radio value="Yes"/>Yes
-                        </label>&emsp;&emsp;
-                        <label>
-                            <Radio value="No"/>No
-                        </label>
-                    </RadioGroup>
-                    <span className="errCls">{this.state.certifiedErr}</span>
-                </FormGroup>
-                <FormGroup style={{display:(!this.state.disableCertFlag?'block':'none')}}>
-                    <Label for="certificationType">If Certifified, Yes</Label>
-                    <CheckboxGroup
-                        checkboxDepth={2} // This is needed to optimize the checkbox group
-                        name="certificationType"
-                        value={this.state.certificationType}
-                        onChange={this.handleCertTypeChg}>
-                        <label><Checkbox value="External" disabled={this.state.disableCertFlag}/> External</label>
-                        <label><Checkbox value="Internal" disabled={this.state.disableCertFlag}/> Internal</label>
-                    </CheckboxGroup>
-                </FormGroup>
-                <FormGroup style={{display:(!this.state.disableCertTimeFlag?'block':'none')}}>
-                    <Label for="certBfTimeFlag">If no, Will you Certify Before Nov 2018</Label>
-                    <RadioGroup onChange={this.handleCertBfTimeFlagChg.bind(this)}
-                        name="certBfTimeFlag" selectedValue={this.state.certBfTimeFlag}
-                        >
-                        <label>
-                            <Radio value="Yes"/>Yes
-                        </label>&emsp;&emsp;
-                        <label>
-                            <Radio value="No"/>No
-                        </label>
-                    </RadioGroup>
-                </FormGroup>
-                <FormGroup style={{display:(!this.state.disableCalendar?'block':'none')}}>
-                    <Label for="certBfTimeFlag">If no, enter the Time Period</Label>
-                    <DatePicker
-                        minDate={moment()}
-                        openToDate={moment()}
-                        readOnly={this.state.disableCalendar}
-                        selected={this.state.startDate}
-                        onChange={this.handleDtChange.bind(this)}
-                    />
-                </FormGroup>
-                <h5 className="succCls"> {this.state.messageFromServer}</h5>
-                <h5 className="errCls">{this.state.subMandatoryErr}</h5>
-                <Button color="success">Submit</Button>
-            </Form>
-        </Container>
+                        <FormGroup>
+                            <Label for="lob">Product/Technology/Skill set</Label>
+                            <Select ref="lob"
+                                value={selectedOptionS}
+                                hideSelectedOptions={false}
+                                isSearchable={false}
+                                onChange={this.handleSkillChange}
+                                options={this.state.skillGrpOptions}
+                            />
+                            <span className="errCls">{this.state.skillErr}</span>
+                        </FormGroup>
+                        <FormGroup>
+                            <Label for="certifiedFlag">Already Certified</Label>
+                            <RadioGroup
+                                name="certifiedFlag"
+                                selectedValue={this.state.certifiedFlag}
+                                onChange={this.handleCertifiedChg.bind(this)}>
+                                <label>
+                                    <Radio value="Yes"/>Yes
+                                </label>&emsp;&emsp;
+                                <label>
+                                    <Radio value="No"/>No
+                                </label>
+                            </RadioGroup>
+                            <span className="errCls">{this.state.certifiedErr}</span>
+                        </FormGroup>
+                        <FormGroup style={{display:(!this.state.disableCertFlag?'block':'none')}}>
+                            <Label for="certificationType">If Certifified, Yes</Label>
+                            <CheckboxGroup
+                                checkboxDepth={2} // This is needed to optimize the checkbox group
+                                name="certificationType"
+                                value={this.state.certificationType}
+                                onChange={this.handleCertTypeChg}>
+                                <label><Checkbox value="External" disabled={this.state.disableCertFlag}/> External</label>
+                                <label><Checkbox value="Internal" disabled={this.state.disableCertFlag}/> Internal</label>
+                            </CheckboxGroup>
+                            <span className="errCls">{this.state.certTypeErr}</span>
+                        </FormGroup>
+                        <FormGroup style={{display:(!this.state.disableCertTimeFlag?'block':'none')}}>
+                            <Label for="certBfTimeFlag">If no, Will you Certify Before Nov 2018</Label>
+                            <RadioGroup onChange={this.handleCertBfTimeFlagChg.bind(this)}
+                                name="certBfTimeFlag" selectedValue={this.state.certBfTimeFlag}
+                                >
+                                <label>
+                                    <Radio value="Yes"/>Yes
+                                </label>&emsp;&emsp;
+                                <label>
+                                    <Radio value="No"/>No
+                                </label>
+                            </RadioGroup>
+                            <span className="errCls">{this.state.certifyBfErr}</span>
+                        </FormGroup>
+                        <FormGroup style={{display:(!this.state.disableCalendar?'block':'none')}}>
+                            <Label for="certBfTimeFlag">If no, enter the Time Period</Label>
+                            <DatePicker
+                                minDate={moment()}
+                                openToDate={moment()}
+                                readOnly={this.state.disableCalendar}
+                                selected={this.state.startDate}
+                                onChange={this.handleDtChange.bind(this)}
+                            />
+                        </FormGroup>
+                        <span className="errCls">{this.state.certifyBfDtErr}</span>
+                        <h5 className="succCls"> {this.state.messageFromServer}</h5>
+                        <h5 className="errCls">{this.state.subMandatoryErr}</h5>
+                        <Button color="success">Submit</Button>
+                    </Form>
+                </Container>
+            </div>
+            <div style={{display:(this.state.alreadySubmitted?'block':'none')}}>
+                <h3>Thanks You have Already Provided us Response!</h3>
+            </div>
+        </div>
         );
     }
 }

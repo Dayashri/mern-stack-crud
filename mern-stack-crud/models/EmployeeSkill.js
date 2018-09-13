@@ -3,13 +3,9 @@ const Schema=mongoose.Schema;
 
 //Create Schema
 const EmployeeSkillSchema=new Schema({
-    fName:{
+    employeeEmail:{
         type:String,
-        required:true
-    },
-    lName: {
-        type: String,
-        required: [true, 'Last Name field is required']
+        required:[true, 'Employee Email field is required']
     },
     employeeId: {
         type: Number,
@@ -21,13 +17,42 @@ const EmployeeSkillSchema=new Schema({
         },
         required: [true, 'Employee Id field is required']
     },
-    skill1: {
-        type: [String],
-        required: [true, 'Skill from Set 1 is required']
+    Portifolio: {
+        type: String,
+        required: [true, 'Portifolio is required']
     },
-    skill2: {
-        type: [String],
-        required: [true, 'Skill from Set 2 is required']
+    DM: {
+        type: String,
+        required: [true, 'DM is required']
+    },
+    LOB: {
+        type: String,
+        required: [true, 'LOB is required']
+    },
+    Group: {
+        type: String,
+        required: [true, 'Group1 is required']
+    },
+    Component: {
+        type: String,
+        required: [true, 'Component is required']
+    },
+    SkillChosen: {
+        type: String,
+        required: [true, 'Skill is required']
+    },
+    Certified: {
+        type: String,
+        required: [true, 'Certified is required']
+    },
+    certificationType: {
+        type: String
+    },
+    certifyBfTime: {
+        type: String
+    },
+    certificationDate:{
+        type: Date
     }
 });
 
