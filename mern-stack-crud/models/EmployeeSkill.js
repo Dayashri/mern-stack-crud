@@ -17,6 +17,10 @@ const EmployeeSkillSchema=new Schema({
         },
         required: [true, 'Employee Id field is required']
     },
+    Account:{
+        type:String,
+        required:[true, 'Employee Account field is required']
+    },
     Portifolio: {
         type: String,
         required: [true, 'Portifolio is required']
