@@ -718,7 +718,7 @@ class EmployeeForm extends React.Component {
                 <div className="col-md-6 col-lg-6 col-sm-12 col-xs-12">
                     <div className="row">
                         <div className="col-md-12 col-lg-12 col-sm-12 col-xs-12">
-                        <b><h5>LOB Details</h5></b>
+                        <b><h5 className="imgDet">LOB Details</h5></b>
                         </div>
                         <div className="col-md-12 col-lg-12 col-sm-12 col-xs-12">
                             <img className="imgDuisp1" src={lobs} alt="LOBs"/>
@@ -728,7 +728,7 @@ class EmployeeForm extends React.Component {
                 <div className="col-md-12 col-lg-12 col-sm-12 col-xs-12">
                     <div className="row">
                         <div className="col-md-12 col-lg-12 col-sm-12 col-xs-12">
-                        <b><h5>Skillsets</h5></b>
+                        <br/><b><h5 className="imgDet">Skillsets</h5></b>
                         </div>
                         <div className="col-md-12 col-lg-12 col-sm-12 col-xs-12">
                             <img className="imgDuisp2" src={skills} alt="SKILLS"/>
