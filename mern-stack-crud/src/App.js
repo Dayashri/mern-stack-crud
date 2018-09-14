@@ -13,26 +13,32 @@ class App extends React.Component {
     employeeId:null,
     loginId:null,
   }
-
   componentWillMount(){
     var showNotAuthorized=this.state.showNotAuthorized;
     var showEmployeeForm=this.state.showEmployeeForm;
+    var employeeId=this.state.employeeId;
+    var loginId=this.state.loginId;
     axios.get('/api/reskill/getUserName').then(response =>{
-      debugger
-      if(response.data.length==0){
+      console.log("before set");
+      console.log("userResp:"+response.data.userFlag);
+      if(response.data.userFlag==0){
         showEmployeeForm=false;
         showNotAuthorized=true;
+        employeeId=null;
+        loginId=null;
       }else{
         showEmployeeForm=true;
         showNotAuthorized=false;
+        employeeId=response.data.employeeId,
+        loginId=response.data.loginId
       }
       this.setState({
         showEmployeeForm:showEmployeeForm,
         showNotAuthorized:showNotAuthorized,
-        employeeId:response.data[0].employeeId,
-        loginId:response.data[0].loginId
-      })
-
+        employeeId:employeeId,
+        loginId:loginId
+      });
+      console.log("after set");
     }).catch(error => {
       //console.log(error.response.data.error)
     });
