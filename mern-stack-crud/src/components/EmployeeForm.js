@@ -64,24 +64,25 @@ class EmployeeForm extends React.Component {
         });
       }
     
-    componentDidUpdate(prevProps){
-        if (prevProps.employeeId !== this.props.employeeId) {
-            axios.get('/api/reskill/checkSubmitStats',{
-                params:{
-                    empId:this.state.empId
-                }
-            }).then(response=>{debugger
-                console.log(response);
-                console.log(response.data.length);
-                localStorage.set('alreadySubmitted',response.data.submittedCount);
-                this.setState({
-                    alreadySubmitted:response.data.submittedCount===0?false:true,
-                    empId:this.props.employeeId,
-                    empEmail:this.props.loginId,subMandatoryErr:""
-                })
-            }).catch(error => {
-                    //console.log(error.response.data.error)
-            });
+    componentDidUpdate(prevProps,prevState){
+        if ((prevProps.employeeId !== this.props.employeeId) || (prevState.messageFromServer!==this.state.messageFromServer)) {
+            // axios.get('/api/reskill/checkSubmitStats',{
+            //     params:{
+            //         empId:this.state.empId
+            //     }
+            // }).then(response=>{
+                // this.setState({
+                //     alreadySubmitted:response.data.submittedCount===0?false:true,
+                //     empId:this.props.employeeId,
+                //     empEmail:this.props.loginId,subMandatoryErr:""
+                // })
+            // }).catch(error => {
+            //         //console.log(error.response.data.error)
+            // });
+            this.setState({
+                empId:this.props.employeeId,
+                empEmail:this.props.loginId,subMandatoryErr:""
+            })
         }
     }
 
@@ -397,7 +398,7 @@ class EmployeeForm extends React.Component {
         })
     }
 
-    handleSubmit(e){debugger
+    handleSubmit(e){
         e.preventDefault();
         var subMandatoryErr="";
         var emailFlag=this.state.emailErr.length===0 && this.state.empEmail!=="";
@@ -546,18 +547,19 @@ class EmployeeForm extends React.Component {
             }).catch(error => {
                     //console.log(error.response.data.error)
             });
-        axios.get('/api/reskill/checkSubmitStats',{
-            params:{
-                empId:this.state.empId
-            }
-        }).then(response=>{
-            localStorage.set('alreadySubmitted',response.data.submittedCount);
-            this.setState({
-                alreadySubmitted:response.data.submittedCount===0?false:true
-            })
-        }).catch(error => {
-                //console.log(error.response.data.error)
-        });
+        // axios.get('/api/reskill/checkSubmitStats',{
+        //     params:{
+        //         empId:this.state.empId
+        //     }
+        // }).then(response=>{
+        //     this.setState({
+        //         alreadySubmitted:response.data.submittedCount===0?false:true,
+        //         empId:this.props.employeeId,
+        //         empEmail:this.props.loginId,subMandatoryErr:""
+        //     })
+        // }).catch(error => {
+        //         //console.log(error.response.data.error)
+        // });
     }
 
     render() {
