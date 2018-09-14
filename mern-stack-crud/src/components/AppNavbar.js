@@ -8,7 +8,7 @@ class AppNavbar extends Component {
       <div>
         <Navbar color="dark" dark expand="sm" className="mb-5">
           <Container>
-            <NavbarBrand href="/">Skills Adder</NavbarBrand>
+            <NavbarBrand href="/">WALMART RESKILL</NavbarBrand>
           </Container>
         </Navbar>
       </div>
