@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { Container,Button, Form, FormGroup, Label, Input } from 'reactstrap';
 import { RadioGroup, Radio} from 'react-radio-group';
 import {Checkbox, CheckboxGroup} from 'react-checkbox-group';
@@ -9,12 +10,13 @@ import DatePicker from 'react-datepicker';
 import moment from 'moment';
 import 'react-datepicker/dist/react-datepicker.css';
 import '../App.css';
+import skills from '../SkillDetails.png';
+import lobs from '../LobDetails.png';
 
 class EmployeeForm extends React.Component {
     constructor(props){
         super(props);
         this.state = {
-            alreadySubmitted:false,
             selectedOptionP:'',
             selectedOptionD: '',
             selectedOptionL: '',
@@ -38,10 +40,12 @@ class EmployeeForm extends React.Component {
             disableCertTimeFlag:true,
             disableCalendar:true,
             startDate: null,
-            empEmail:this.props.loginId,
+            empEmail:'',
             emailErr:'',
-            empId:this.props.employeeId,
+            empId:'',
             empErr:'',
+            empAcc:'',
+            accErr:'',
             portifolioErr:'',
             dmErr:'',
             lobErr:"",
@@ -60,31 +64,11 @@ class EmployeeForm extends React.Component {
     handleDtChange(date) {
         this.setState({
             messageFromServer:"",
-          startDate: date,subMandatoryErr:""
+            startDate: date,
+            subMandatoryErr:""
         });
       }
     
-    componentDidUpdate(prevProps,prevState){
-        if ((prevProps.employeeId !== this.props.employeeId) || (prevState.messageFromServer!==this.state.messageFromServer)) {
-            // axios.get('/api/reskill/checkSubmitStats',{
-            //     params:{
-            //         empId:this.state.empId
-            //     }
-            // }).then(response=>{
-                // this.setState({
-                //     alreadySubmitted:response.data.submittedCount===0?false:true,
-                //     empId:this.props.employeeId,
-                //     empEmail:this.props.loginId,subMandatoryErr:""
-                // })
-            // }).catch(error => {
-            //         //console.log(error.response.data.error)
-            // });
-            this.setState({
-                empId:this.props.employeeId,
-                empEmail:this.props.loginId,subMandatoryErr:""
-            })
-        }
-    }
 
     handleCertifiedChg(value) {
         var certificationType=this.state.certificationType;
@@ -398,11 +382,30 @@ class EmployeeForm extends React.Component {
         })
     }
 
+    onChangeEmpAcc(e){
+        e.preventDefault();
+        var accErr=this.state.accErr;
+        var subMandatoryErr="";
+        var inputVal=e.target.value;
+        if(inputVal===""){
+            accErr='This is a mandatory field';
+        }else{
+            accErr='';
+        }
+        this.setState({
+            accErr:accErr,
+            empAcc:inputVal,
+            messageFromServer:"",
+            subMandatoryErr:subMandatoryErr
+        })
+    }
+
     handleSubmit(e){
         e.preventDefault();
         var subMandatoryErr="";
         var emailFlag=this.state.emailErr.length===0 && this.state.empEmail!=="";
         var empIdFlag=this.state.empErr.length===0 && this.state.empId!=="";
+        var accFlag=this.state.empAcc!==""&&this.state.accErr.length===0;
         var portifolioFlag=this.state.portifolioErr.length===0 && this.state.selectedOptionP.value!=="";
         var dmFlag=this.state.dmErr.length===0 && this.state.selectedOptionD.value!=="" 
                     && this.state.selectedOptionD.label!=="Please select Your Portfolio";
@@ -421,7 +424,7 @@ class EmployeeForm extends React.Component {
         var certifyBfErr="";
         var certifyBfDtErr="";
         if(emailFlag&&empIdFlag&&portifolioFlag&&dmFlag&&lobFlag && groupFlag &&
-            compFlag&& skillsFlag&& certifiedFlag){
+            compFlag&& skillsFlag&& certifiedFlag&&accFlag){
                 if(this.state.certifiedFlag==="Yes"){
                     if(this.state.certificationType.length==0){
                         certTypeErr="This field is Mandatory";
@@ -451,6 +454,7 @@ class EmployeeForm extends React.Component {
                     var querystring={
                         employeeEmail: this.state.empEmail,
                         employeeId: this.state.empId,
+                        Account:this.state.empAcc,
                         Portifolio:this.state.selectedOptionP.value,
                         DM: this.state.selectedOptionD.value,
                         LOB: this.state.selectedOptionL.value,
@@ -481,9 +485,9 @@ class EmployeeForm extends React.Component {
                             disableCertTimeFlag:true,
                             disableCalendar:true,
                             startDate: null,
-                            empEmail:this.props.loginId,
+                            empEmail:'',
                             emailErr:'',
-                            empId:this.props.employeeId,
+                            empId:'',
                             empErr:'',
                             portifolioErr:'',
                             dmErr:'',
@@ -547,19 +551,6 @@ class EmployeeForm extends React.Component {
             }).catch(error => {
                     //console.log(error.response.data.error)
             });
-        // axios.get('/api/reskill/checkSubmitStats',{
-        //     params:{
-        //         empId:this.state.empId
-        //     }
-        // }).then(response=>{
-        //     this.setState({
-        //         alreadySubmitted:response.data.submittedCount===0?false:true,
-        //         empId:this.props.employeeId,
-        //         empEmail:this.props.loginId,subMandatoryErr:""
-        //     })
-        // }).catch(error => {
-        //         //console.log(error.response.data.error)
-        // });
     }
 
     render() {
@@ -570,22 +561,32 @@ class EmployeeForm extends React.Component {
         const selectedOptionC=this.state.selectedOptionC;
         const selectedOptionS=this.state.selectedOptionS;
         return (
-        <div>
-            <div style={{display:(!this.state.alreadySubmitted?'block':'none')}}>
-                <Container>
-                    <Form onSubmit={this.handleSubmit.bind(this)}>
+            <div>
+                <h5 className="errCls pull-right"> Note:  Multiple Submissions are allowed!</h5>
+        <div className="row">
+            
+            <br/>
+            <div className="col-md-6 col-lg-6 col-sm-12 col-xs-12" style={{"paddingLeft":"3%"}}>
+                <div className="container">
+                    <Form onSubmit={this.handleSubmit.bind(this)} style={{"fontSize":"11px"}}>
                         <FormGroup>
-                            <Label for="empId">Emp ID </Label>
-                            <Input readOnly  type="text" name="empId" id="empId" ref="empId" value={this.state.empId} onChange={this.onChangeEmpId.bind(this)}/>
+                            <Label for="empId">Emp ID </Label><span className="errCls">*</span>
+                            <Input type="text" name="empId" id="empId" ref="empId" value={this.state.empId} onChange={this.onChangeEmpId.bind(this)}/>
                             <span className="errCls">{this.state.empErr}</span>
                         </FormGroup>
                         <FormGroup>
-                            <Label for="empEml">Email ID</Label>
-                            <Input readOnly  type="text" name="empEml" id="empEml" ref="empEml" value={this.state.empEmail} placeholder="without @infosys.com" onChange={this.onChangeEmpEmail.bind(this)}/>
+                            <Label for="empEml">Email ID</Label><span className="errCls">*</span>
+                            <Input type="text" name="empEml" id="empEml" ref="empEml" value={this.state.empEmail} onChange={this.onChangeEmpEmail.bind(this)}/>
+                            <span><i className="glyphicon glyphicon-info-sign"></i>&nbsp; without @infosys.com</span>
                             <span className="errCls">{this.state.emailErr}</span>
                         </FormGroup>
                         <FormGroup>
-                            <Label for="portifolio">Portfolio</Label>
+                            <Label for="empAcc">Account</Label><span className="errCls">*</span>
+                            <Input type="text" name="empAcc" id="empAcc" ref="empAcc" value={this.state.empAcc} onChange={this.onChangeEmpAcc.bind(this)}/>
+                            <span className="errCls">{this.state.accErr}</span>
+                        </FormGroup>
+                        <FormGroup>
+                            <Label for="portifolio">Portfolio</Label><span className="errCls">*</span>
                             <Select ref="portifolio"
                                 value={selectedOptionP}
                                 options={this.state.portifolioOptions}
@@ -596,7 +597,7 @@ class EmployeeForm extends React.Component {
                             <span className="errCls">{this.state.portifolioErr}</span>
                         </FormGroup>
                         <FormGroup>
-                            <Label for="dm">DM</Label>
+                            <Label for="dm">DM</Label><span className="errCls">*</span>
                             <Select ref="dm"
                                 value={selectedOptionD}
                                 options={this.state.DMOptions}
@@ -607,7 +608,7 @@ class EmployeeForm extends React.Component {
                             <span className="errCls">{this.state.dmErr}</span>
                         </FormGroup>
                         <FormGroup>
-                            <Label for="lob">LOB</Label>
+                            <Label for="lob">LOB</Label><span className="errCls">*</span>
                             <Select ref="lob"
                                 value={selectedOptionL}
                                 hideSelectedOptions={false}
@@ -619,7 +620,7 @@ class EmployeeForm extends React.Component {
                         </FormGroup>
 
                         <FormGroup>
-                            <Label for="grp">Group</Label>
+                            <Label for="grp">Group</Label><span className="errCls">*</span>
                             <Select ref="grp"
                                 value={selectedOptionG}
                                 hideSelectedOptions={false}
@@ -631,7 +632,7 @@ class EmployeeForm extends React.Component {
                         </FormGroup>
 
                         <FormGroup>
-                            <Label for="comp">Components</Label>
+                            <Label for="comp">Components</Label><span className="errCls">*</span>
                             <Select ref="comp"
                                 value={selectedOptionC}
                                 hideSelectedOptions={false}
@@ -643,7 +644,7 @@ class EmployeeForm extends React.Component {
                         </FormGroup>
 
                         <FormGroup>
-                            <Label for="lob">Product/Technology/Skill set</Label>
+                            <Label for="lob">Product/Technology/Skill set</Label><span className="errCls">*</span>
                             <Select ref="lob"
                                 value={selectedOptionS}
                                 hideSelectedOptions={false}
@@ -654,7 +655,7 @@ class EmployeeForm extends React.Component {
                             <span className="errCls">{this.state.skillErr}</span>
                         </FormGroup>
                         <FormGroup>
-                            <Label for="certifiedFlag">Already Certified</Label>
+                            <Label for="certifiedFlag">Already Certified</Label><span className="errCls">*</span>
                             <RadioGroup
                                 name="certifiedFlag"
                                 selectedValue={this.state.certifiedFlag}
@@ -696,26 +697,66 @@ class EmployeeForm extends React.Component {
                         </FormGroup>
                         <FormGroup style={{display:(!this.state.disableCalendar?'block':'none')}}>
                             <Label for="certBfTimeFlag">If no, enter the Time Period</Label>
-                            <DatePicker
+                            <DatePicker customInput={<ExampleCustomInput />}
                                 minDate={moment()}
                                 openToDate={moment()}
                                 readOnly={this.state.disableCalendar}
                                 selected={this.state.startDate}
                                 onChange={this.handleDtChange.bind(this)}
                             />
+                            <span className="errClass"><i className="glyphicon glyphicon-info-sign"></i>&emsp;Note: This will be added as a goal in ICount</span>
                         </FormGroup>
                         <span className="errCls">{this.state.certifyBfDtErr}</span>
                         <h5 className="succCls"> {this.state.messageFromServer}</h5>
                         <h5 className="errCls">{this.state.subMandatoryErr}</h5>
-                        <Button color="success">Submit</Button>
+                        <Button color="success dtCls">Submit</Button>
                     </Form>
-                </Container>
+                </div>
             </div>
-            <div style={{display:(this.state.alreadySubmitted?'block':'none')}}>
-                <h3>Thanks You have Already Provided us Response!</h3>
+            <div className="col-md-4 col-lg-4 col-sm-12 col-xs-12">
+
+                <div className="col-md-6 col-lg-6 col-sm-12 col-xs-12">
+                    <div className="row">
+                        <div className="col-md-12 col-lg-12 col-sm-12 col-xs-12">
+                        <b><h5>LOB Details</h5></b>
+                        </div>
+                        <div className="col-md-12 col-lg-12 col-sm-12 col-xs-12">
+                            <img className="imgDuisp1" src={lobs} alt="LOBs"/>
+                        </div>
+                    </div>
+                </div>
+                <div className="col-md-12 col-lg-12 col-sm-12 col-xs-12">
+                    <div className="row">
+                        <div className="col-md-12 col-lg-12 col-sm-12 col-xs-12">
+                        <b><h5>Skillsets</h5></b>
+                        </div>
+                        <div className="col-md-12 col-lg-12 col-sm-12 col-xs-12">
+                            <img className="imgDuisp2" src={skills} alt="SKILLS"/>
+                        </div>
+                    </div>
+                </div>
+            </div>
             </div>
         </div>
         );
     }
 }
+class ExampleCustomInput extends React.Component {
+
+    render () {
+      return (
+        <span
+          className="label label-primary dtCls"
+          onClick={this.props.onClick}><i className="glyphicon glyphicon-calendar"></i>
+          {this.props.value}
+        </span>
+      )
+    }
+  }
+
+ExampleCustomInput.propTypes = {
+    onClick: PropTypes.func,
+    value: PropTypes.string
+  }
+
 export default EmployeeForm;
