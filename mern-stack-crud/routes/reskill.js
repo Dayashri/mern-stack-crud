@@ -23,7 +23,6 @@ router.get('/getAllPortifolio',(req,res)=>{
 
 router.get('/getOnlyPortifolio',(req,res)=>{
     console.log("inside getOnlyPortifolio");
-    console.log(req.query.name);
     portifolio.find({"name":req.query.name})
         .then(portifolio=>res.json(portifolio))
 });
@@ -36,7 +35,6 @@ router.get('/getSkillgroups',(req,res)=>{
 
 router.get('/getOneSkillGroup',(req,res)=>{
     console.log("inside getOneSkillGroup");
-    console.log(req.query.name);
     skillset.find({"name":req.query.name},{"Components.name":1})
         .then(skillset=>res.json(skillset))
 });
@@ -71,9 +69,15 @@ router.post('/addSkill',(req,res,next)=>{
 
 router.get('/getUserName',(req,res)=>{
     console.log("inside getUserName");
-    employeeDir.find({"loginId":os.userInfo().username},{"employeeId":1,"loginId":1}).then(employee=>res.json(employee));
+    console.log(os.userInfo().username);
+    employeeDir.find({"loginId":os.userInfo().username},{"employeeId":1,"loginId":1}).then(employee=>{
+        if(employee.length===0){
+            res.send({userFlag:0});
+        }else{
+            res.send({userFlag:1,employeeId:employee[0].employeeId,loginId:employee[0].loginId});
+        }
+    });
 });
-
 router.post('/addEmployee',(req,res,next)=>{
     console.log("inside addEmployee");
     employeeDir.create(req.body).then(function(employeedir){
@@ -82,7 +86,7 @@ router.post('/addEmployee',(req,res,next)=>{
 });
 
 router.get('/checkSubmitStats',(req,res)=>{
-    console.log("inside getUserName");
+    console.log("inside checkSubmitStats");
     employeeDir.find({"employeeId":req.query.empId},{"employeeId":1,"loginId":1}).then(employee=>{
         if(employee.length===0){
             res.send({submittedCount:0});
