@@ -15,3 +15,31 @@
 ::-webkit-input-placeholder { text-align:right; }
 /* mozilla solution */
 input:-moz-placeholder { text-align:right; }
+
+a {
+  color: #e1e6ea;
+}
+a:hover{
+  color: #e1e6ea;
+}
+
+a.brand{
+  color: #e1e6ea;
+}
+a.brand:hover{
+  color: #e1e6ea;
+}
+.imgDuisp1{
+  display: block;
+  height: 200px;
+}
+.imgDuisp2{
+  display: block;
+  height: 300px;
+}
+.dtCls{
+  font-size: 12px;
+}
+.formControlSz{
+  font-size: 1.25rem;
+}
