@@ -571,18 +571,18 @@ class EmployeeForm extends React.Component {
                     <Form onSubmit={this.handleSubmit.bind(this)} style={{"fontSize":"11px"}}>
                         <FormGroup>
                             <Label for="empId">Emp ID </Label><span className="errCls">*</span>
-                            <Input type="text" name="empId" id="empId" ref="empId" value={this.state.empId} onChange={this.onChangeEmpId.bind(this)}/>
+                            <Input type="text" name="empId" id="empId" ref="empId" className="formControlSz" value={this.state.empId} onChange={this.onChangeEmpId.bind(this)}/>
                             <span className="errCls">{this.state.empErr}</span>
                         </FormGroup>
                         <FormGroup>
                             <Label for="empEml">Email ID</Label><span className="errCls">*</span>
-                            <Input type="text" name="empEml" id="empEml" ref="empEml" value={this.state.empEmail} onChange={this.onChangeEmpEmail.bind(this)}/>
+                            <Input type="text" name="empEml" id="empEml" ref="empEml" className="formControlSz" value={this.state.empEmail} onChange={this.onChangeEmpEmail.bind(this)}/>
                             <span><i className="glyphicon glyphicon-info-sign"></i>&nbsp; without @infosys.com</span>
                             <span className="errCls">{this.state.emailErr}</span>
                         </FormGroup>
                         <FormGroup>
                             <Label for="empAcc">Account</Label><span className="errCls">*</span>
-                            <Input type="text" name="empAcc" id="empAcc" ref="empAcc" value={this.state.empAcc} onChange={this.onChangeEmpAcc.bind(this)}/>
+                            <Input type="text" name="empAcc" id="empAcc" ref="empAcc" className="formControlSz" value={this.state.empAcc} onChange={this.onChangeEmpAcc.bind(this)}/>
                             <span className="errCls">{this.state.accErr}</span>
                         </FormGroup>
                         <FormGroup>
