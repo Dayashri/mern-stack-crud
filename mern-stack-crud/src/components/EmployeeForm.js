@@ -703,7 +703,7 @@ class EmployeeForm extends React.Component {
                                 readOnly={this.state.disableCalendar}
                                 selected={this.state.startDate}
                                 onChange={this.handleDtChange.bind(this)}
-                            />
+                            /><br/>
                             <span className="errCls"><i className="glyphicon glyphicon-info-sign"></i>&emsp;Note: This will be added as a goal in iCount</span>
                         </FormGroup>
                         <span className="errCls">{this.state.certifyBfDtErr}</span>
