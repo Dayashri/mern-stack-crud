@@ -704,7 +704,7 @@ class EmployeeForm extends React.Component {
                                 selected={this.state.startDate}
                                 onChange={this.handleDtChange.bind(this)}
                             />
-                            <span className="errClass"><i className="glyphicon glyphicon-info-sign"></i>&emsp;Note: This will be added as a goal in ICount</span>
+                            <span className="errCls"><i className="glyphicon glyphicon-info-sign"></i>&emsp;Note: This will be added as a goal in iCount</span>
                         </FormGroup>
                         <span className="errCls">{this.state.certifyBfDtErr}</span>
                         <h5 className="succCls"> {this.state.messageFromServer}</h5>
