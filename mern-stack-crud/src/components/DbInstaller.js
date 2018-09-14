@@ -212,8 +212,12 @@ class DbInstaller extends React.Component {
         e.preventDefault();
         var empDetails=[
             {
-                "loginId":"Durai",
-                "employeeId":0
+                "loginId":"dayashri.durairaj",
+                "employeeId":737351
+            },
+            {
+                "loginId":"Ravi_Vasu",
+                "employeeId":74852
             }
         ];
         empDetails.forEach(function(querystring){
