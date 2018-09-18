@@ -1,0 +1,11 @@
+router.get('/getAllSkills',(req,res)=>{
+    console.log("inside getAllSkills");
+    skillset.find({})
+        .then(skillset=>res.json(skillset))
+});
+
+router.get('/getSkillgroups',(req,res)=>{
+    console.log("inside getSkillgroups");
+    skillset.find({},{"name":1})
+        .then(skillset=>res.json(skillset))
+});
